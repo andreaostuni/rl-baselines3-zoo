@@ -22,6 +22,7 @@ reference_scores = [
     ReferenceScore("AntBulletEnv-v0", 300, 3500),
     ReferenceScore("HopperBulletEnv-v0", 20, 2500),
     ReferenceScore("Walker2DBulletEnv-v0", 200, 2500),
+    ReferenceScore("CartPole-v1", 8, 500),
 ]
 
 # Alternative scaling

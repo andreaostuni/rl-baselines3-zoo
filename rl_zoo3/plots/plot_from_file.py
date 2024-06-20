@@ -156,6 +156,9 @@ def plot_from_file():  # noqa: C901
         "Ant": "AntBulletEnv-v0",
         "Hopper": "HopperBulletEnv-v0",
         "Walker": "Walker2DBulletEnv-v0",
+        "Cartpole-v1": "CartPole-v1",
+        "HalfCheetahBullet": "HalfCheetahBulletEnv-v0",
+        "AntBullet": "AntBulletEnv-v0",
     }
     # Backward compat
     skip_all_algos_dict = False
@@ -163,6 +166,9 @@ def plot_from_file():  # noqa: C901
     for key in keys:
         algo_scores, all_algo_scores = [], []
         for env in envs:
+            print(f"Processing {env}-{key}")
+            print(f"Results: {results[env][key]['last_evals']}")
+
             if isinstance(results[env][key]["last_evals"], (np.float32, np.float64)):
                 # No enough timesteps
                 print(f"Skipping {env}-{key}")

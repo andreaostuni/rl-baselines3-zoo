@@ -7,7 +7,7 @@ import warnings
 from collections import OrderedDict
 from pathlib import Path
 from pprint import pprint
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union, Type
 
 import gymnasium as gym
 import numpy as np
@@ -45,9 +45,12 @@ from stable_baselines3.common.vec_env import (
 # For custom activation fn
 from torch import nn as nn
 
+# for MPC algorithms
+from mpc_baselines.common.callbacks import EvalCallback as MPCEvalCallback
+
 # Register custom envs
 import rl_zoo3.import_envs  # noqa: F401
-from rl_zoo3.callbacks import SaveVecNormalizeCallback, TrialEvalCallback
+from rl_zoo3.callbacks import SaveVecNormalizeCallback, TrialEvalCallback, TrialMPCEvalCallback
 from rl_zoo3.hyperparams_opt import HYPERPARAMS_SAMPLER
 from rl_zoo3.utils import ALGOS, get_callback_list, get_class_by_name, get_latest_run_id, get_wrapper_class, linear_schedule
 
@@ -429,6 +432,11 @@ class ExperimentManager:
         if "policy" in hyperparams and "." in hyperparams["policy"]:
             hyperparams["policy"] = get_class_by_name(hyperparams["policy"])
 
+        # import the dynamics when using a custom dynamics
+        if "policy_kwargs" in hyperparams:
+            if "dynamics" in hyperparams["policy_kwargs"] and "." in hyperparams["policy_kwargs"]["dynamics"]:
+                hyperparams["policy_kwargs"]["dynamics"] = get_class_by_name(hyperparams["policy_kwargs"]["dynamics"])()
+            
         # obtain a class object from a wrapper name string in hyperparams
         # and delete the entry
         env_wrapper = get_wrapper_class(hyperparams)
@@ -510,15 +518,16 @@ class ExperimentManager:
                 print("Creating test environment")
 
             save_vec_normalize = SaveVecNormalizeCallback(save_freq=1, save_path=self.params_path)
-            eval_callback = EvalCallback(
-                self.create_envs(self.n_eval_envs, eval_env=True),
-                callback_on_new_best=save_vec_normalize,
-                best_model_save_path=self.save_path,
-                n_eval_episodes=self.n_eval_episodes,
-                log_path=self.save_path,
-                eval_freq=self.eval_freq,
-                deterministic=self.deterministic_eval,
-            )
+            eval_callback_cls = EvalCallback if "mpc" not in self.algo else MPCEvalCallback
+            eval_callback = eval_callback_cls(
+                    self.create_envs(self.n_eval_envs, eval_env=True),
+                    callback_on_new_best=save_vec_normalize,
+                    best_model_save_path=self.save_path,
+                    n_eval_episodes=self.n_eval_episodes,
+                    log_path=self.save_path,
+                    eval_freq=self.eval_freq,
+                    deterministic=self.deterministic_eval,
+                )
 
             self.callbacks.append(eval_callback)
 
@@ -770,7 +779,8 @@ class ExperimentManager:
         if self.optimization_log_path is not None:
             path = os.path.join(self.optimization_log_path, f"trial_{trial.number!s}")
         callbacks = get_callback_list({"callback": self.specified_callbacks})
-        eval_callback = TrialEvalCallback(
+        eval_callback_cls = TrialEvalCallback if 'mpc' not in self.algo else TrialMPCEvalCallback
+        eval_callback = eval_callback_cls(
             eval_env,
             trial,
             best_model_save_path=path,

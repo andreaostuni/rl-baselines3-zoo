@@ -26,6 +26,11 @@ except ImportError:
     pass
 
 try:
+    import mpc_baselines.envs
+except ImportError:
+    pass
+
+try:
     import gym_donkeycar
 except ImportError:
     pass

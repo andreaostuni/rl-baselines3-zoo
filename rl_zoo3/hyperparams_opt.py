@@ -97,6 +97,28 @@ def sample_ppo_lstm_params(trial: optuna.Trial, n_actions: int, n_envs: int, add
 
     return hyperparams
 
+def sample_mpc_ppo_params(trial: optuna.Trial, n_actions: int, n_envs: int, additional_args: dict) -> Dict[str, Any]:
+    """
+    Sampler for MPCPPO hyperparams.
+    uses sample_ppo_params(), this function samples for the policy_kwargs
+    :param trial:
+    :return:
+    """
+    hyperparams = sample_ppo_params(trial, n_actions, n_envs, additional_args)
+
+    from mpc_baselines.dynamics import PendulumDynamics
+
+    mpc_horizon = trial.suggest_categorical("mpc_horizon", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    dynamics = PendulumDynamics()
+    hyperparams["policy_kwargs"].update(
+        {
+            "dynamics": dynamics,
+            "mpc_horizon": mpc_horizon,
+        }
+    )
+
+    return hyperparams
+
 
 def sample_trpo_params(trial: optuna.Trial, n_actions: int, n_envs: int, additional_args: dict) -> Dict[str, Any]:
     """
