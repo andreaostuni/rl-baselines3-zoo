@@ -174,7 +174,8 @@ def sample_ppo_lstm_params(trial: optuna.Trial, n_actions: int, n_envs: int, add
 
     # return hyperparams
 
-def sample_mpc_ppo_params(trial: optuna.Trial, n_actions: int, n_envs: int, additional_args: dict) -> Dict[str, Any]:
+
+def sample_mpc_ppo_params(trial: optuna.Trial, n_actions: int, n_envs: int, additional_args: dict) -> dict[str, Any]:
     """
     Sampler for MPCPPO hyperparams.
     uses sample_ppo_params(), this function samples for the policy_kwargs
@@ -183,9 +184,13 @@ def sample_mpc_ppo_params(trial: optuna.Trial, n_actions: int, n_envs: int, addi
     """
     hyperparams = sample_ppo_params(trial, n_actions, n_envs, additional_args)
 
+    from mpc_baselines.dynamics import PendulumDynamics
+
     mpc_horizon = trial.suggest_categorical("mpc_horizon", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    dynamics = PendulumDynamics()
     hyperparams["policy_kwargs"].update(
         {
+            "dynamics": dynamics,
             "mpc_horizon": mpc_horizon,
         }
     )
@@ -319,7 +324,8 @@ def sample_sac_params(trial: optuna.Trial, n_actions: int, n_envs: int, addition
 
     return convert_offpolicy_params(hyperparams)
 
-def sample_mpc_sac_params(trial: optuna.Trial, n_actions: int, n_envs: int, additional_args: dict) -> Dict[str, Any]:
+
+def sample_mpc_sac_params(trial: optuna.Trial, n_actions: int, n_envs: int, additional_args: dict) -> dict[str, Any]:
     """
     Sampler for MPCSAC hyperparams.
     uses sample_sac_params(), this function samples for the policy_kwargs
@@ -336,6 +342,7 @@ def sample_mpc_sac_params(trial: optuna.Trial, n_actions: int, n_envs: int, addi
     )
 
     return hyperparams
+
 
 def sample_td3_params(trial: optuna.Trial, n_actions: int, n_envs: int, additional_args: dict) -> dict[str, Any]:
     """
