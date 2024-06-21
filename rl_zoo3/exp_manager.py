@@ -739,7 +739,7 @@ class ExperimentManager:
         kwargs = self._hyperparams.copy()
 
         n_envs = 1 if self.algo == "ars" else self.n_envs
-
+        dynamics = kwargs.get("policy_kwargs", {}).get("dynamics", None)
         additional_args = {
             "using_her_replay_buffer": kwargs.get("replay_buffer_class") == HerReplayBuffer,
             "her_kwargs": kwargs.get("replay_buffer_kwargs", {}),
@@ -748,7 +748,8 @@ class ExperimentManager:
         # Sample candidate hyperparameters
         sampled_hyperparams = HYPERPARAMS_SAMPLER[self.algo](trial, self.n_actions, n_envs, additional_args)
         kwargs.update(sampled_hyperparams)
-
+        if dynamics is not None:
+            kwargs["policy_kwargs"]["dynamics"] = dynamics
         env = self.create_envs(n_envs, no_log=True)
 
         # By default, do not activate verbose output to keep
