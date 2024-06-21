@@ -569,4 +569,5 @@ HYPERPARAMS_SAMPLER = {
     "ppo_lstm": sample_ppo_lstm_params,
     "td3": sample_td3_params,
     "trpo": sample_trpo_params,
+    "mpc_ppo": sample_mpc_ppo_params,
 }
