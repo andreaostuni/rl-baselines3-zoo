@@ -324,6 +324,23 @@ def sample_sac_params(trial: optuna.Trial, n_actions: int, n_envs: int, addition
 
     return convert_offpolicy_params(hyperparams)
 
+def sample_mpc_sac_params(trial: optuna.Trial, n_actions: int, n_envs: int, additional_args: dict) -> Dict[str, Any]:
+    """
+    Sampler for MPCSAC hyperparams.
+    uses sample_sac_params(), this function samples for the policy_kwargs
+    :param trial:
+    :return:
+    """
+    hyperparams = sample_sac_params(trial, n_actions, n_envs, additional_args)
+
+    mpc_horizon = trial.suggest_categorical("mpc_horizon", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    hyperparams["policy_kwargs"].update(
+        {
+            "mpc_horizon": mpc_horizon,
+        }
+    )
+
+    return hyperparams
 
 def sample_mpc_sac_params(trial: optuna.Trial, n_actions: int, n_envs: int, additional_args: dict) -> dict[str, Any]:
     """
