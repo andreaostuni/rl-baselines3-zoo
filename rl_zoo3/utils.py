@@ -20,6 +20,7 @@ from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.sb2_compat.rmsprop_tf_like import RMSpropTFLike  # noqa: F401
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecEnv, VecFrameStack, VecNormalize
 from mpc_baselines.ppo import MPCPPO
+from mpc_baselines.sac import MPCSAC
 
 # For custom activation fn
 from torch import nn as nn
@@ -39,6 +40,7 @@ ALGOS: Dict[str, Type[BaseAlgorithm]] = {
     "ppo_lstm": RecurrentPPO,
     # MPC Baselines
     "mpc_ppo": MPCPPO,
+    "mpc_sac": MPCSAC,
 }
 
 

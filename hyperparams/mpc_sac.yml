@@ -1,0 +1,14 @@
+
+PendulumMPC-v1:
+  # callback:
+  #   - rl_zoo3.callbacks.ParallelTrainCallback
+  n_timesteps: 20000
+  vec_env_wrapper: mpc_baselines.wrappers.VecMPCStateWrapper
+  n_envs: 4
+  # n_timesteps: !!float 1e5
+  policy: 'MPCMlpPolicy'
+  policy_kwargs: 
+    dynamics: mpc_baselines.dynamics.PendulumDynamics
+    mpc_horizon: 3
+  mpc_state_dim: 2
+  learning_rate: !!float 1e-3
