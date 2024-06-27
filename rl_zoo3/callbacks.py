@@ -9,6 +9,7 @@ from typing import Optional, Type, Union
 import optuna
 from sb3_contrib import TQC
 from stable_baselines3 import SAC
+from mpc_baselines import MPCSAC
 from stable_baselines3.common.callbacks import BaseCallback, EvalCallback
 from stable_baselines3.common.logger import TensorBoardOutputFormat
 from stable_baselines3.common.vec_env import VecEnv
@@ -161,10 +162,10 @@ class ParallelTrainCallback(BaseCallback):
         super().__init__(verbose)
         self.batch_size = 0
         self._model_ready = True
-        self._model: Union[SAC, TQC]
+        self._model: Union[SAC, TQC, MPCSAC]
         self.gradient_steps = gradient_steps
         self.process: Thread
-        self.model_class: Union[Type[SAC], Type[TQC]]
+        self.model_class: Union[Type[SAC], Type[TQC], Type[MPCSAC]] 
         self.sleep_time = sleep_time
 
     def _init_callback(self) -> None:
@@ -176,12 +177,12 @@ class ParallelTrainCallback(BaseCallback):
             temp_file = os.path.join("logs", "model_tmp.zip")  # type: ignore[arg-type,assignment]
 
         # make mypy happy
-        assert isinstance(self.model, (SAC, TQC)), f"{self.model} is not supported for parallel training"
+        assert isinstance(self.model, (SAC, TQC, MPCSAC)), f"{self.model} is not supported for parallel training"
 
         self.model.save(temp_file)  # type: ignore[arg-type]
 
         # TODO: add support for other algorithms
-        for model_class in [SAC, TQC]:
+        for model_class in [SAC, TQC, MPCSAC]:
             if isinstance(self.model, model_class):
                 self.model_class = model_class  # type: ignore[assignment]
                 break
@@ -230,7 +231,7 @@ class ParallelTrainCallback(BaseCallback):
 
     def _on_rollout_end(self) -> None:
         # Make mypy happy
-        assert isinstance(self.model, (SAC, TQC))
+        assert isinstance(self.model, (SAC, TQC, MPCSAC))
 
         if self._model_ready:
             self._model.replay_buffer = deepcopy(self.model.replay_buffer)

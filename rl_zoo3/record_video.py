@@ -151,12 +151,22 @@ if __name__ == "__main__":
     episode_starts = np.ones((env.num_envs,), dtype=bool)
     try:
         for _ in range(video_length):
-            action, lstm_states = model.predict(
-                obs,  # type: ignore[arg-type]
-                state=lstm_states,
-                episode_start=episode_starts,
-                deterministic=deterministic,
-            )
+            if "mpc" in algo:
+                mpc_state = env.get_mpc_state()
+                action, lstm_states = model.predict(
+                    obs,  # type: ignore[arg-type]
+                    mpc_state=mpc_state,
+                    state=lstm_states,
+                    episode_start=episode_starts,
+                    deterministic=deterministic,
+                )    
+            else:
+                action, lstm_states = model.predict(
+                    obs,  # type: ignore[arg-type]
+                    state=lstm_states,
+                    episode_start=episode_starts,
+                    deterministic=deterministic,
+                )
             if not args.no_render:
                 env.render()
             obs, _, dones, _ = env.step(action)  # type: ignore[assignment]

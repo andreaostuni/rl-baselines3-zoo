@@ -124,7 +124,7 @@ def enjoy() -> None:  # noqa: C901
     print(f"Loading {model_path}")
 
     # Off-policy algorithm only support one env for now
-    off_policy_algos = ["qrdqn", "dqn", "ddpg", "sac", "her", "td3", "tqc"]
+    off_policy_algos = ["qrdqn", "dqn", "ddpg", "sac", "her", "td3", "tqc", "mpc_sac"]
 
     set_random_seed(args.seed)
 
@@ -212,12 +212,22 @@ def enjoy() -> None:  # noqa: C901
 
     try:
         for _ in generator:
-            action, lstm_states = model.predict(
-                obs,  # type: ignore[arg-type]
-                state=lstm_states,
-                episode_start=episode_start,
-                deterministic=deterministic,
-            )
+            if "mpc" in algo:
+                mpc_state = env.get_mpc_state()
+                action, lstm_states = model.predict(
+                    obs,  # type: ignore[arg-type]
+                    mpc_state,
+                    state=lstm_states,
+                    episode_start=episode_start,
+                    deterministic=deterministic,
+                )
+            else:
+                action, lstm_states = model.predict(
+                    obs,  # type: ignore[arg-type]
+                    state=lstm_states,
+                    episode_start=episode_start,
+                    deterministic=deterministic,
+                )
             obs, reward, done, infos = env.step(action)
 
             episode_start = done
