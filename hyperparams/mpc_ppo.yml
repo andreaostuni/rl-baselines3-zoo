@@ -36,3 +36,8 @@ MountainCarContinuous-v0:
   vf_coef: 0.19
   use_sde: True
   policy_kwargs: "dict(log_std_init=-3.29, ortho_init=False)"
+  policy_kwargs: 
+    dynamics: mpc_baselines.dynamics.MountainCarDynamics
+    mpc_horizon: 3
+    log_std_init: -3.29
+    ortho_init: False

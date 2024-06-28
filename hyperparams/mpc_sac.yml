@@ -28,7 +28,7 @@ MountainCarContinuousMPC-v0:
   learning_starts: 0
   use_sde: True
   policy_kwargs: 
-    dynamics: mpc_baselines.dynamics.PendulumDynamics
+    dynamics: mpc_baselines.dynamics.MountainCarDynamics
     mpc_horizon: 3
     log_std_init: -3.67 
     net_arch: [64, 64]
