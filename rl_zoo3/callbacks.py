@@ -4,7 +4,7 @@ import time
 from copy import deepcopy
 from functools import wraps
 from threading import Thread
-from typing import Optional, Type, Union
+from typing import Optional, Union
 
 import optuna
 from sb3_contrib import TQC
@@ -15,6 +15,7 @@ from stable_baselines3.common.logger import TensorBoardOutputFormat
 from stable_baselines3.common.vec_env import VecEnv
 
 from mpc_baselines.common.callbacks import EvalCallback as MPCEvalCallback
+
 
 class TrialEvalCallback(EvalCallback):
     """
@@ -57,7 +58,8 @@ class TrialEvalCallback(EvalCallback):
                 self.is_pruned = True
                 return False
         return True
-    
+
+
 class TrialMPCEvalCallback(MPCEvalCallback):
     """
     Callback used for evaluating and reporting a trial.
@@ -100,7 +102,6 @@ class TrialMPCEvalCallback(MPCEvalCallback):
                 self.is_pruned = True
                 return False
         return True
-
 
 
 class SaveVecNormalizeCallback(BaseCallback):
@@ -165,7 +166,7 @@ class ParallelTrainCallback(BaseCallback):
         self._model: Union[SAC, TQC, MPCSAC]
         self.gradient_steps = gradient_steps
         self.process: Thread
-        self.model_class: Union[Type[SAC], Type[TQC], Type[MPCSAC]] 
+        self.model_class: Union[type[SAC], type[TQC], type[MPCSAC]]
         self.sleep_time = sleep_time
 
     def _init_callback(self) -> None:
