@@ -23,6 +23,8 @@ reference_scores = [
     ReferenceScore("HopperBulletEnv-v0", 20, 2500),
     ReferenceScore("Walker2DBulletEnv-v0", 200, 2500),
     ReferenceScore("CartPole-v1", 8, 500),
+    ReferenceScore("LunarLanderContinuous-v3", -200, 250),
+    ReferenceScore("BipedalWalker-v3", -100, 300),
 ]
 
 # Alternative scaling
