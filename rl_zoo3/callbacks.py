@@ -4,7 +4,6 @@ import time
 from copy import deepcopy
 from functools import wraps
 from threading import Thread
-from typing import Optional, Union
 
 import optuna
 from sb3_contrib import TQC
@@ -30,8 +29,8 @@ class TrialEvalCallback(EvalCallback):
         eval_freq: int = 10000,
         deterministic: bool = True,
         verbose: int = 0,
-        best_model_save_path: Optional[str] = None,
-        log_path: Optional[str] = None,
+        best_model_save_path: str | None = None,
+        log_path: str | None = None,
     ) -> None:
         super().__init__(
             eval_env=eval_env,
@@ -74,8 +73,8 @@ class TrialMPCEvalCallback(MPCEvalCallback):
         eval_freq: int = 10000,
         deterministic: bool = True,
         verbose: int = 0,
-        best_model_save_path: Optional[str] = None,
-        log_path: Optional[str] = None,
+        best_model_save_path: str | None = None,
+        log_path: str | None = None,
     ) -> None:
         super().__init__(
             eval_env=eval_env,
@@ -114,7 +113,7 @@ class SaveVecNormalizeCallback(BaseCallback):
         only one file will be kept.
     """
 
-    def __init__(self, save_freq: int, save_path: str, name_prefix: Optional[str] = None, verbose: int = 0):
+    def __init__(self, save_freq: int, save_path: str, name_prefix: str | None = None, verbose: int = 0):
         super().__init__(verbose)
         self.save_freq = save_freq
         self.save_path = save_path
@@ -163,10 +162,10 @@ class ParallelTrainCallback(BaseCallback):
         super().__init__(verbose)
         self.batch_size = 0
         self._model_ready = True
-        self._model: Union[SAC, TQC, MPCSAC]
+        self._model: SAC | TQC | MPCSAC
         self.gradient_steps = gradient_steps
         self.process: Thread
-        self.model_class: Union[type[SAC], type[TQC], type[MPCSAC]]
+        self.model_class: type[SAC] | type[TQC] | type[MPCSAC]
         self.sleep_time = sleep_time
 
     def _init_callback(self) -> None:
